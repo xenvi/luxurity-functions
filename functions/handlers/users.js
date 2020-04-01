@@ -50,7 +50,17 @@ exports.signup = (req, res) => {
     })
     .catch(err => {
       console.error(err);
-      return res.status(500).json({ error: err.code });
+      if (err.code === "auth/email-already-in-use") {
+        return res.status(400).json({ email: "Email is already in use" });
+      } else if (err.code === "auth/weak-password") {
+        return res
+          .status(400)
+          .json({ password: "Password should be at least 6 characters" });
+      } else {
+        return res
+          .status(500)
+          .json({ general: "Something went wrong, please try again" });
+      }
     });
 };
 
@@ -73,6 +83,28 @@ exports.login = (req, res) => {
     })
     .then(token => {
       res.status(200).json({ token });
+    })
+    .catch(err => {
+      console.error(err);
+      //"auth/wrong-password"
+      //"auth/user-not-found"
+      return res
+        .status(403)
+        .json({ general: "Wrong credentials, please try again" });
+    });
+};
+
+exports.getAuthenticatedUser = (req, res) => {
+  let userData = {};
+  db.doc(`/users/${req.user.handle}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        userData.credentials = doc.data();
+      }
+    })
+    .then(() => {
+      return res.json(userData);
     })
     .catch(err => {
       console.error(err);

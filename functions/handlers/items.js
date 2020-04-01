@@ -47,13 +47,14 @@ exports.getItem = (req, res) => {
 
 exports.createItem = (req, res) => {
   const newItem = {
-    userHandle: req.user.handle,
     title: req.body.title,
     style: req.body.style,
     color: req.body.color,
-    description: req.body.description,
     neckline: req.body.neckline,
-    size: req.body.size,
+    price: req.body.price,
+    imageUrl: req.body.imageUrl,
+    quantity: req.body.quantity,
+    addedToCart: req.body.addedToCart,
     createdAt: new Date().toISOString()
   };
 

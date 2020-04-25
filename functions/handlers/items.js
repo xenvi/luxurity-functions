@@ -4,17 +4,17 @@ const { db } = require("../util/admin");
 exports.getAllItems = (req, res) => {
   db.collection("items")
     .get()
-    .then(data => {
+    .then((data) => {
       let items = [];
-      data.forEach(doc => {
+      data.forEach((doc) => {
         items.push({
           itemId: doc.id,
-          ...doc.data()
+          ...doc.data(),
         });
       });
       return res.json(items);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       res.status(500).json({ error: err.code });
     });
@@ -25,7 +25,7 @@ exports.getItem = (req, res) => {
   let itemData = {};
   db.doc(`/items/${req.params.itemId}`)
     .get()
-    .then(doc => {
+    .then((doc) => {
       if (!doc.exists) {
         return res.status(404).json({ error: "Item does not exist." });
       }
@@ -39,7 +39,7 @@ exports.getItem = (req, res) => {
     .then(() => {
       res.json(itemData);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       res.status(500).json({ error: err.code });
     });
@@ -48,24 +48,24 @@ exports.getItem = (req, res) => {
 exports.createItem = (req, res) => {
   const newItem = {
     title: req.body.title,
-    style: req.body.style,
+    styles: req.body.styles,
     color: req.body.color,
     neckline: req.body.neckline,
     price: req.body.price,
     imageUrl: req.body.imageUrl,
     quantity: req.body.quantity,
     addedToCart: req.body.addedToCart,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   };
 
   db.collection("items")
     .add(newItem)
-    .then(doc => {
+    .then((doc) => {
       resItem = newItem;
       resItem.itemId = doc.id;
       res.json(resItem);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       res.status(500).json({ error: err.code });
     });

@@ -11,7 +11,7 @@ exports.signup = (req, res) => {
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
-    handle: req.body.handle
+    handle: req.body.handle,
   };
 
   const { valid, errors } = validateSignupData(newUser);
@@ -22,7 +22,7 @@ exports.signup = (req, res) => {
 
   db.doc(`/users/${newUser.handle}`)
     .get()
-    .then(doc => {
+    .then((doc) => {
       if (doc.exists) {
         return res.status(400).json({ handle: "this handle is already taken" });
       } else {
@@ -31,24 +31,24 @@ exports.signup = (req, res) => {
           .createUserWithEmailAndPassword(newUser.email, newUser.password);
       }
     })
-    .then(data => {
+    .then((data) => {
       userId = data.user.uid;
       return data.user.getIdToken();
     })
-    .then(idToken => {
+    .then((idToken) => {
       token = idToken;
       const userCredentials = {
         handle: newUser.handle,
         email: newUser.email,
         createdAt: new Date().toISOString(),
-        userId
+        userId,
       };
       return db.doc(`/users/${newUser.handle}`).set(userCredentials);
     })
     .then(() => {
       return res.status(201).json({ token });
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       if (err.code === "auth/email-already-in-use") {
         return res.status(400).json({ email: "Email is already in use" });
@@ -67,7 +67,7 @@ exports.signup = (req, res) => {
 exports.login = (req, res) => {
   const user = {
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
   };
 
   const { valid, errors } = validateLoginData(user);
@@ -77,14 +77,14 @@ exports.login = (req, res) => {
   firebase
     .auth()
     .signInWithEmailAndPassword(user.email, user.password)
-    .then(data => {
+    .then((data) => {
       userId = data.user.uid;
       return data.user.getIdToken();
     })
-    .then(token => {
+    .then((token) => {
       res.status(200).json({ token });
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       //"auth/wrong-password"
       //"auth/user-not-found"
@@ -98,7 +98,7 @@ exports.getAuthenticatedUser = (req, res) => {
   let userData = {};
   db.doc(`/users/${req.user.handle}`)
     .get()
-    .then(doc => {
+    .then((doc) => {
       if (doc.exists) {
         userData.credentials = doc.data();
       }
@@ -106,7 +106,7 @@ exports.getAuthenticatedUser = (req, res) => {
     .then(() => {
       return res.json(userData);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       return res.status(500).json({ error: err.code });
     });
